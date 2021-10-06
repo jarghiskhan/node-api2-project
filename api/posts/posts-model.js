@@ -34,24 +34,15 @@ function insert(post) {
 }
 
 function update(id, post) {
-  const foundPost = db("posts")
-  .where({ id: Number(id) })
-  .first();
-  return Promise.resolve()
-    .then(() => db("posts").where("id", Number(id)).update(post))
-    .then(() => {
-      return foundPost;
-    });
+  return db('posts')
+    .where('id', Number(id))
+    .update(post);
 }
 
 function remove(id) {
-  const post = db("posts")
-    .where({ id: Number(id) })
-    .first();
-  console.log(post)
-  db("posts").where("id", Number(id)).del();
-  
-  return post;
+  return db('posts')
+    .where('id', Number(id))
+    .del();
 }
 
 function findPostComments(postId) {
