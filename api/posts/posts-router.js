@@ -54,9 +54,33 @@ router.post("/", (req, res) => {
 
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const changes = req.body;
+  console.log(req.body.title)
   let foundPost;
   let newPost;
+  Posts.findById(id).then((post) => {
+    if (!post) {
+      res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist" });
+    } else {
+      foundPost = post
+      Posts.update(id, req.body)
+        .then((post) => {
+          if (!req.body.title || !req.body.contents) {
+            res
+              .status(400)
+              .json({
+                message: "Please provide the title and contents for the post",
+              });
+          } else{
+            newPost = {...foundPost, title: req.body.title, contents: req.body.contents}
+            res.status(200).json(newPost);
+          }
+        }).catch(()=>{
+          res.status(400).json({message:"Please provide title and contents for the post"})
+        })
+    }
+  });
 });
 
 router.delete("/:id", (req, res) => {
