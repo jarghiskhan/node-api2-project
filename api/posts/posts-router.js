@@ -87,12 +87,7 @@ router.delete("/:id", (req, res) => {
   const { id } = req.params;
   let deletedPost;
   Posts.findById(id).then((post) => {
-    if (!post) {
-      res
-        .status(404)
-        .json({ message: "The post with the specified ID does not exist" });
-    } else {
-      deletedPost = post;
+    deletedPost = post;
       Posts.remove(id)
         .then((post) => {
           if (!post) {
@@ -108,20 +103,20 @@ router.delete("/:id", (req, res) => {
         .catch(() => {
           res.status(500).json({ message: "The post could not be removed" });
         });
-    }
+    
   });
 });
 
 router.get("/:id/comments", (req, res) => {
   const { id } = req.params;
   Posts.findPostComments(id)
-    .then((user) => {
-      if (!user) {
+    .then((post) => {
+      if (!res.body || !post) {
         res
           .status(404)
           .json({ message: "The user with the specified ID does not exist" });
       } else {
-        res.status(200).json(user);
+        res.status(200).json(post);
       }
     })
     .catch((err) => {
