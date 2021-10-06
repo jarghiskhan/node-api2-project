@@ -57,30 +57,6 @@ router.put("/:id", (req, res) => {
   const changes = req.body;
   let foundPost;
   let newPost;
-  Posts.findById(id).then((post) => {
-    if (!post) {
-      res
-        .status(404)
-        .json({ message: "The post with the specified ID does not exist" });
-    } else {
-      foundPost = post;
-      Posts.update(id, changes).then(() => {
-        if (!changes.title || !changes.contents) {
-          res.status(400).json({
-            message: "Please provide title and contents for the post",
-          });
-        } else {
-          newPost = {
-            ...foundPost,
-            title: changes.title,
-            contents: changes.contents,
-          };
-          res.status(200).json({ newPost });
-        }
-      });
-      res.status(200).json(post);
-    }
-  });
 });
 
 router.delete("/:id", (req, res) => {
@@ -88,40 +64,39 @@ router.delete("/:id", (req, res) => {
   let deletedPost;
   Posts.findById(id).then((post) => {
     deletedPost = post;
-      Posts.remove(id)
-        .then((post) => {
-          if (!post) {
-            res
-              .status(404)
-              .json({
-                message: "The post with the specified ID does not exist",
-              });
-          } else {
-            res.status(200).json(deletedPost);
-          }
-        })
-        .catch(() => {
-          res.status(500).json({ message: "The post could not be removed" });
-        });
-    
+    Posts.remove(id)
+      .then((post) => {
+        if (!post) {
+          res.status(404).json({
+            message: "The post with the specified ID does not exist",
+          });
+        } else {
+          res.status(200).json(deletedPost);
+        }
+      })
+      .catch(() => {
+        res.status(500).json({ message: "The post could not be removed" });
+      });
   });
 });
 
 router.get("/:id/comments", (req, res) => {
   const { id } = req.params;
-  Posts.findPostComments(id)
-    .then((post) => {
-      if (!res.body || !post) {
-        res
-          .status(404)
-          .json({ message: "The user with the specified ID does not exist" });
-      } else {
-        res.status(200).json(post);
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ message: err });
-    });
+  Posts.findById(id).then((post) => {
+    if (!post) {
+      res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist" });
+    } else {
+      Posts.findPostComments(id)
+        .then((post) => {
+          res.status(200).json(post);
+        })
+        .catch((err) => {
+          res.status(500).json({ message: err });
+        });
+    }
+  });
 });
 
 module.exports = router;
